@@ -29,9 +29,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
@@ -80,6 +78,16 @@ public class SamplesController {
         // workflow.validateAndExecute(input);
         log.info("done web controller");
         return ResponseEntity.ok(true);
+    }
+
+
+    @GetMapping("/setAtp/{uuid}")
+    void setATPSignal(@PathVariable String uuid) {
+
+        log.info("workflow setATPSignal - {}", uuid);
+        HsiaWorkflowSaga workflow = client.newWorkflowStub(HsiaWorkflowSaga.class, uuid);
+        workflow.setAtp(uuid);
+
     }
 
     private void validate() {

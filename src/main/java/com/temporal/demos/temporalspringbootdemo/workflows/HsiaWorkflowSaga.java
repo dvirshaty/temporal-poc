@@ -12,7 +12,7 @@ public interface HsiaWorkflowSaga {
 
 
     @SignalMethod
-    void setAtp();
+    void setAtp(String uuid);
 
     @SignalMethod
     void setBrassCallback();

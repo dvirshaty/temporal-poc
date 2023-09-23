@@ -14,8 +14,10 @@ import io.temporal.workflow.Saga;
 import io.temporal.workflow.Workflow;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
+import org.springframework.util.CollectionUtils;
 
 import java.time.Duration;
+import java.util.List;
 
 @WorkflowImpl(taskQueues = "HsiaTaskQueue")
 @RequiredArgsConstructor
@@ -58,8 +60,8 @@ public class HsiaWorkflowSageImpl implements HsiaWorkflowSaga {
         saveToDB(input);
         try {
             logger.info("start workflow !!!");
-            setAbrActivity.setAbr(input);
             saga.addCompensation(compensateActivity::compensate, input);
+            setAbrActivity.setAbr(input);
             logger.info("wait for ATP");
             Workflow.await(() -> isAtpCallback);
             getAbrActivity.getAbr(input);
@@ -82,9 +84,12 @@ public class HsiaWorkflowSageImpl implements HsiaWorkflowSaga {
     }
 
     @Override
-    public void setAtp() {
+    public void setAtp(String uuid) {
         logger.info("got ATP!");
-        isAtpCallback = true;
+        List<Hsia> byUuid = hisaRepository.findByUuid(uuid);
+        if (!CollectionUtils.isEmpty(byUuid)) {
+            isAtpCallback = true;
+        }
     }
 
     @Override

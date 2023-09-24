@@ -1,10 +1,13 @@
-management:
-  endpoints:
-    web:
-      exposure:
-        include: prometheus
 server:
   port: 8080
+
+management:
+  endpoint:
+    health:
+      show-details: "ALWAYS"
+    web:
+      exposure:
+        include: "*"
 
 spring:
   application:
@@ -50,7 +53,7 @@ spring:
     workersAutoDiscovery:
       packages: com.temporal
 abr-client-configuration:
-  baseUrl: "http://zlty28623.vci.att.com:31996/restservices/abrgenerate/v1/abrs"
-  username: "m03232@ebizReg.att.com"
-  password: "BC$ervices2020"
+  baseUrl: "http://localhost/restservices/abrgenerate/v1/abrs"
+  username: "111"
+  password: "222"
 

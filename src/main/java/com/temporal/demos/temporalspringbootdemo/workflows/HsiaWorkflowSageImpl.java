@@ -2,6 +2,7 @@ package com.temporal.demos.temporalspringbootdemo.workflows;
 
 import com.temporal.demos.temporalspringbootdemo.activities.compensate.CompensateActivity;
 import com.temporal.demos.temporalspringbootdemo.activities.hsia.HsiaActivity;
+import com.temporal.demos.temporalspringbootdemo.activities.ssdf.AtpCallbackActivity;
 import com.temporal.demos.temporalspringbootdemo.activities.ssdf.GetAbrActivity;
 import com.temporal.demos.temporalspringbootdemo.activities.ssdf.SetAbrActivity;
 import com.temporal.demos.temporalspringbootdemo.dto.HsiaDto;
@@ -24,7 +25,12 @@ import java.util.List;
 public class HsiaWorkflowSageImpl implements HsiaWorkflowSaga {
     private static final Logger logger = Workflow.getLogger(HsiaWorkflowSageImpl.class);
     private final HisaRepository hisaRepository;
-
+    private final AtpCallbackActivity atpCallbackActivity =
+            Workflow.newActivityStub(AtpCallbackActivity.class,
+                    ActivityOptions.newBuilder()
+                            .setRetryOptions(RetryOptions.newBuilder().setMaximumAttempts(1).build())
+                            .setStartToCloseTimeout(Duration.ofSeconds(20))
+                            .build());
     private final GetAbrActivity getAbrActivity =
             Workflow.newActivityStub(GetAbrActivity.class,
                     ActivityOptions.newBuilder()
@@ -63,12 +69,13 @@ public class HsiaWorkflowSageImpl implements HsiaWorkflowSaga {
             saga.addCompensation(compensateActivity::compensate, input);
             setAbrActivity.setAbr(input);
             logger.info("wait for ATP");
-            Workflow.await(() -> isAtpCallback);
+            Workflow.await(Duration.ofSeconds(30L), () -> isAtpCallback);
+            atpCallbackActivity.handleAtpCallback(isAtpCallback);
             getAbrActivity.getAbr(input);
             hsiaActivity.submitHsia(input);
             saga.addCompensation(compensateActivity::compensate2, input);
             logger.info("wait for BRASS callback");
-            Workflow.await(() -> isBrassCallback);
+            Workflow.await(Duration.ofSeconds(30L), () -> isBrassCallback);
             hsiaActivity.sspCallback(input);
             logger.info("Done workflow !!!");
         } catch (Exception e) {
@@ -80,7 +87,8 @@ public class HsiaWorkflowSageImpl implements HsiaWorkflowSaga {
 
     private void saveToDB(HsiaDto input) {
         Hsia hsia = Hsia.builder().uuid(input.getUuid()).name(input.getName()).contact(input.getContact()).build();
-        hisaRepository.save(hsia);
+        Hsia save = hisaRepository.save(hsia);
+        input.setId(save.getId());
     }
 
     @Override

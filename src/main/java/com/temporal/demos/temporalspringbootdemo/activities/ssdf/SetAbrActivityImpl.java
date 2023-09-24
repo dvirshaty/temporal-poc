@@ -17,11 +17,12 @@ public class SetAbrActivityImpl implements SetAbrActivity {
 
     @Override
     public void setAbr(HsiaDto input) {
+
         logger.info("set ABR to SSDF - {}", input);
+
         Random rd = new Random(); // creating Random boolean
         if (!rd.nextBoolean()) {
-            logger.info("Filed to setABR to SSDF - {}", input);
-            throw new RuntimeException("Filed to SetABR for input -" + input.getId());
+            throw new RuntimeException("Failed setABR");
         }
 
 

@@ -82,11 +82,11 @@ public class SamplesController {
 
 
     @GetMapping("/setAtp/{uuid}")
-    void setATPSignal(@PathVariable String uuid) {
-
+    ResponseEntity<Boolean> setATPSignal(@PathVariable String uuid) {
         log.info("workflow setATPSignal - {}", uuid);
         HsiaWorkflowSaga workflow = client.newWorkflowStub(HsiaWorkflowSaga.class, uuid);
         workflow.setAtp(uuid);
+        return ResponseEntity.ok(true);
 
     }
 

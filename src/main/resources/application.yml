@@ -57,3 +57,6 @@ abr-client-configuration:
   username: "111"
   password: "222"
 
+hsia-workflow-saga:
+  waitForAtpSeconds: 50
+  waitForHsiaCallbackSeconds: 50

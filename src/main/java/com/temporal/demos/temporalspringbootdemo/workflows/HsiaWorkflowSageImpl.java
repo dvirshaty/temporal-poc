@@ -5,6 +5,7 @@ import com.temporal.demos.temporalspringbootdemo.activities.hsia.HsiaActivity;
 import com.temporal.demos.temporalspringbootdemo.activities.ssdf.AtpCallbackActivity;
 import com.temporal.demos.temporalspringbootdemo.activities.ssdf.GetAbrActivity;
 import com.temporal.demos.temporalspringbootdemo.activities.ssdf.SetAbrActivity;
+import com.temporal.demos.temporalspringbootdemo.config.HsiaWorkflowConfig;
 import com.temporal.demos.temporalspringbootdemo.dto.HsiaDto;
 import com.temporal.demos.temporalspringbootdemo.repository.HisaRepository;
 import com.temporal.demos.temporalspringbootdemo.repository.model.Hsia;
@@ -25,36 +26,23 @@ import java.util.List;
 public class HsiaWorkflowSageImpl implements HsiaWorkflowSaga {
     private static final Logger logger = Workflow.getLogger(HsiaWorkflowSageImpl.class);
     private final HisaRepository hisaRepository;
-    private final AtpCallbackActivity atpCallbackActivity =
-            Workflow.newActivityStub(AtpCallbackActivity.class,
-                    ActivityOptions.newBuilder()
-                            .setRetryOptions(RetryOptions.newBuilder().setMaximumAttempts(1).build())
-                            .setStartToCloseTimeout(Duration.ofSeconds(20))
-                            .build());
-    private final GetAbrActivity getAbrActivity =
-            Workflow.newActivityStub(GetAbrActivity.class,
-                    ActivityOptions.newBuilder()
-                            .setStartToCloseTimeout(Duration.ofSeconds(20))
-                            .build());
-    private final SetAbrActivity setAbrActivity =
-            Workflow.newActivityStub(SetAbrActivity.class,
-                    ActivityOptions.newBuilder()
-                            .setRetryOptions(RetryOptions.newBuilder().setMaximumAttempts(2).build())
-                            .setStartToCloseTimeout(Duration.ofSeconds(20))
-                            .build());
+    private final HsiaWorkflowConfig hsiaWorkflowConfig;
 
-    private final HsiaActivity hsiaActivity =
-            Workflow.newActivityStub(HsiaActivity.class,
-                    ActivityOptions.newBuilder()
-                            .setStartToCloseTimeout(Duration.ofSeconds(20))
-                            .build());
+    private final AtpCallbackActivity atpCallbackActivity = Workflow.newActivityStub(AtpCallbackActivity.class,
+            ActivityOptions.newBuilder().setRetryOptions(RetryOptions.newBuilder().setMaximumAttempts(1).build())
+                    .setStartToCloseTimeout(Duration.ofSeconds(20)).build());
+    private final GetAbrActivity getAbrActivity = Workflow.newActivityStub(GetAbrActivity.class,
+            ActivityOptions.newBuilder().setStartToCloseTimeout(Duration.ofSeconds(20)).build());
+    private final SetAbrActivity setAbrActivity = Workflow.newActivityStub(SetAbrActivity.class,
+                    ActivityOptions.newBuilder().setRetryOptions(RetryOptions.newBuilder().setMaximumAttempts(2).build())
+                            .setStartToCloseTimeout(Duration.ofSeconds(20)).build());
+
+    private final HsiaActivity hsiaActivity = Workflow.newActivityStub(HsiaActivity.class,
+            ActivityOptions.newBuilder().setStartToCloseTimeout(Duration.ofSeconds(20)).build());
 
 
-    private final CompensateActivity compensateActivity =
-            Workflow.newActivityStub(CompensateActivity.class,
-                    ActivityOptions.newBuilder()
-                            .setStartToCloseTimeout(Duration.ofSeconds(20))
-                            .build());
+    private final CompensateActivity compensateActivity = Workflow.newActivityStub(CompensateActivity.class,
+            ActivityOptions.newBuilder().setStartToCloseTimeout(Duration.ofSeconds(20)).build());
 
     private boolean isAtpCallback = false;
     private boolean isBrassCallback = false;
@@ -63,19 +51,20 @@ public class HsiaWorkflowSageImpl implements HsiaWorkflowSaga {
     @Override // WorkflowMethod
     public void validateAndExecute(HsiaDto input) {
         Saga saga = new Saga(new Saga.Options.Builder().setParallelCompensation(false).build());
+
         saveToDB(input);
         try {
             logger.info("start workflow !!!");
             saga.addCompensation(compensateActivity::compensate, input);
             setAbrActivity.setAbr(input);
             logger.info("wait for ATP");
-            Workflow.await(Duration.ofSeconds(30L), () -> isAtpCallback);
+            Workflow.await(Duration.ofSeconds(hsiaWorkflowConfig.getWaitForAtpSeconds()), () -> isAtpCallback);
             atpCallbackActivity.handleAtpCallback(isAtpCallback);
             getAbrActivity.getAbr(input);
             hsiaActivity.submitHsia(input);
             saga.addCompensation(compensateActivity::compensate2, input);
             logger.info("wait for BRASS callback");
-            Workflow.await(Duration.ofSeconds(30L), () -> isBrassCallback);
+            Workflow.await(Duration.ofSeconds(hsiaWorkflowConfig.getWaitForHsiaCallbackSeconds()), () -> isBrassCallback);
             hsiaActivity.sspCallback(input);
             logger.info("Done workflow !!!");
         } catch (Exception e) {

@@ -1,6 +1,7 @@
 package com.temporal.demos.temporalspringbootdemo.activities.ssdf;
 
 import com.temporal.demos.temporalspringbootdemo.dto.HsiaDto;
+import com.temporal.demos.temporalspringbootdemo.exception.NonRetryException;
 import io.temporal.spring.boot.ActivityImpl;
 import io.temporal.workflow.Workflow;
 import lombok.RequiredArgsConstructor;
@@ -20,9 +21,12 @@ public class SetAbrActivityImpl implements SetAbrActivity {
 
         logger.info("set ABR to SSDF - {}", input);
 
+
         Random rd = new Random(); // creating Random boolean
         if (!rd.nextBoolean()) {
-            throw new RuntimeException("Failed setABR");
+            //throw new RuntimeException("Failed setABR");
+            throw new NonRetryException("Failed setABR");
+
         }
 
 

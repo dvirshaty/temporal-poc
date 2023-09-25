@@ -7,6 +7,7 @@ import com.temporal.demos.temporalspringbootdemo.activities.ssdf.GetAbrActivity;
 import com.temporal.demos.temporalspringbootdemo.activities.ssdf.SetAbrActivity;
 import com.temporal.demos.temporalspringbootdemo.config.HsiaWorkflowConfig;
 import com.temporal.demos.temporalspringbootdemo.dto.HsiaDto;
+import com.temporal.demos.temporalspringbootdemo.exception.NonRetryException;
 import com.temporal.demos.temporalspringbootdemo.repository.HisaRepository;
 import com.temporal.demos.temporalspringbootdemo.repository.model.Hsia;
 import io.temporal.activity.ActivityOptions;
@@ -34,7 +35,7 @@ public class HsiaWorkflowSageImpl implements HsiaWorkflowSaga {
     private final GetAbrActivity getAbrActivity = Workflow.newActivityStub(GetAbrActivity.class,
             ActivityOptions.newBuilder().setStartToCloseTimeout(Duration.ofSeconds(20)).build());
     private final SetAbrActivity setAbrActivity = Workflow.newActivityStub(SetAbrActivity.class,
-                    ActivityOptions.newBuilder().setRetryOptions(RetryOptions.newBuilder().setMaximumAttempts(2).build())
+                    ActivityOptions.newBuilder().setRetryOptions(RetryOptions.newBuilder().setMaximumAttempts(2).setDoNotRetry(NonRetryException.class.getName()).build())
                             .setStartToCloseTimeout(Duration.ofSeconds(20)).build());
 
     private final HsiaActivity hsiaActivity = Workflow.newActivityStub(HsiaActivity.class,

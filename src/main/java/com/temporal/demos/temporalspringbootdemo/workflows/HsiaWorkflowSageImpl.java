@@ -71,6 +71,7 @@ public class HsiaWorkflowSageImpl implements HsiaWorkflowSaga {
         } catch (Exception e) {
             logger.info("workflow failed, try to compensate");
             saga.compensate();
+            throw  e;
         }
 
     }

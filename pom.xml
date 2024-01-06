@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.1.3</version>
+        <version>3.2.0</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.temporal.demos</groupId>
@@ -14,8 +14,8 @@
     <name>temporal-springboot-demo</name>
     <description>Temporal Spring Boot Demo</description>
     <properties>
-        <java.version>11</java.version>
-        <version.temporal>1.19.1</version.temporal>
+        <java.version>21</java.version>
+        <version.temporal>1.22.2</version.temporal>
         <spring-cloud.version>2021.0.3</spring-cloud.version>
         <spring-cloud-sleuth-otel.version>1.1.0-M7</spring-cloud-sleuth-otel.version>
         <version.serverlessworkflow.sdk>3.0.0.Final</version.serverlessworkflow.sdk>
@@ -48,10 +48,21 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>${lombok.version}</version>
+            <version>1.18.30</version>
             <scope>provided</scope>
         </dependency>
 
+        <dependency>
+            <groupId>commons-validator</groupId>
+            <artifactId>commons-validator</artifactId>
+            <version>1.7</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.reflections</groupId>
+            <artifactId>reflections</artifactId>
+            <version>0.10.2</version>
+        </dependency>
         <!-- Temporal -->
         <dependency>
             <groupId>io.temporal</groupId>
@@ -80,6 +91,7 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
+
     </dependencies>
     <!--    <dependencyManagement>
             <dependencies>

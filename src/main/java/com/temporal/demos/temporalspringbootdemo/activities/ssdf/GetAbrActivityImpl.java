@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-@ActivityImpl(taskQueues = "HsiaTaskQueue")
+@ActivityImpl(taskQueues = {"HsiaTaskQueue","CleanTaskQueue"})
 public class GetAbrActivityImpl implements GetAbrActivity {
 
     private static final Logger logger = Workflow.getLogger(GetAbrActivityImpl.class);
@@ -22,6 +22,11 @@ public class GetAbrActivityImpl implements GetAbrActivity {
     public void getAbr(HsiaDto input) {
 
         logger.info("get ABR - {}",input);
+    }
+
+    @Override
+    public void clean() {
+        logger.info("clean");
     }
 
     @Override

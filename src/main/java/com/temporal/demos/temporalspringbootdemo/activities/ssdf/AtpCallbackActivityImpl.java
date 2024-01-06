@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-@ActivityImpl(taskQueues = "HsiaTaskQueue")
+@ActivityImpl(taskQueues = {"HsiaTaskQueue"})
 public class AtpCallbackActivityImpl implements AtpCallbackActivity {
     private static final Logger logger = Workflow.getLogger(AtpCallbackActivityImpl.class);
 

@@ -12,4 +12,6 @@ public interface GetAbrActivity {
 
     boolean validate(String abrId);
 
+     void clean();
+
 }

@@ -1,6 +1,7 @@
 package com.temporal.demos.temporalspringbootdemo.activities.hsia;
 
 import com.temporal.demos.temporalspringbootdemo.dto.HsiaDto;
+import io.temporal.activity.Activity;
 import io.temporal.spring.boot.ActivityImpl;
 import io.temporal.workflow.Workflow;
 import lombok.RequiredArgsConstructor;
@@ -9,7 +10,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-@ActivityImpl(taskQueues = "HsiaTaskQueue")
+@ActivityImpl(taskQueues = {"CleanTaskQueue"})
 public class HsiaActivityImpl implements HsiaActivity {
 
 
@@ -17,6 +18,7 @@ public class HsiaActivityImpl implements HsiaActivity {
 
     @Override
     public void submitHsia(HsiaDto hsiaDto) {
+
         logger.info("start Submit to Hsia - {}", hsiaDto);
     }
 

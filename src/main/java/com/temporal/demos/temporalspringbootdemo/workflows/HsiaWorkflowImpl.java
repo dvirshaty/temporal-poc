@@ -1,3 +1,4 @@
+/*
 package com.temporal.demos.temporalspringbootdemo.workflows;
 
 import com.temporal.demos.temporalspringbootdemo.activities.compensate.CompensateActivity;
@@ -10,6 +11,7 @@ import io.temporal.common.RetryOptions;
 import io.temporal.spring.boot.WorkflowImpl;
 import io.temporal.workflow.Workflow;
 import org.slf4j.Logger;
+import org.slf4j.MDC;
 
 import java.time.Duration;
 
@@ -49,6 +51,7 @@ public class HsiaWorkflowImpl implements HsiaWorkflow {
     @Override // WorkflowMethod
     public void validateAndExecute(HsiaDto input) {
         try {
+            logger.info(MDC.getCopyOfContextMap().toString());
             logger.info("start workflow !!!");
             setAbrActivity.setAbr(input);
             logger.info("wait for ATP");
@@ -61,7 +64,7 @@ public class HsiaWorkflowImpl implements HsiaWorkflow {
             logger.info("Done workflow !!!");
         } catch (Exception e) {
             logger.info("workflow failed, try to compensate");
-            compensateActivity.compensate(input);
+
         }
 
     }
@@ -80,3 +83,4 @@ public class HsiaWorkflowImpl implements HsiaWorkflow {
 
 
 }
+*/
